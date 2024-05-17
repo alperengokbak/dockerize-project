@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main # Trigger the workflow on push to main branch
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -13,26 +14,28 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Log in to Azure
-        uses: azure/login@v1
+        uses: azure/login@v1.1.4
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: "Build & Push to ACR"
-        uses: azure/docker-login@v1
+        uses: azure/docker-login@v1.1.4
         with:
-          login-server: acr4958034.azurecr.io
+          login-server: ${{ secrets.REGISTRY_NAME }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Build and push Docker image
         run: |
           docker build -t ${{ secrets.CONTAINER_REGISTERY_SERVER_NAME }}:${{ github.sha }} .
-          docker push -t ${{ secrets.CONTAINER_REGISTERY_SERVER_NAME }}:${{ github.sha }}
+          docker push ${{ secrets.CONTAINER_REGISTERY_SERVER_NAME }}:${{ github.sha }}
 
       - name: "Deploy from ACR to App Service"
         uses: azure/webapps-deploy@v2
         with:
-          app-name: "se4453-final-webapp"
+          app-name: ${{ secrets.WEBAPP_NAME }}
           images: "${{ secrets.CONTAINER_REGISTERY_SERVER_NAME }}:${{ github.sha }}"
-      - run: |
+
+      - name: Log out from Azure
+        run: |
           az logout
