@@ -21,7 +21,7 @@ jobs:
       - name: "Build & Push to ACR"
         uses: azure/docker-login@v1
         with:
-          login-server: acr4958034.azurecr.io
+          login-server: ${{ secrets.CONTAINER_REGISTRY_LOGIN_SERVER_NAME }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
