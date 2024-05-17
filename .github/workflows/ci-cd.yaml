@@ -14,27 +14,24 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Log in to Azure
-        uses: azure/login@v2
+        uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: "Build & Push to ACR"
-        uses: azure/docker-login@latest
-        with:
-          login-server: ${{ secrets.CONTAINER_REGISTERY_LOGIN_SERVER_NAME }}
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: Log in to ACR
+        run: |
+          echo ${{ secrets.REGISTRY_PASSWORD }} | docker login ${{ secrets.REGISTRY_NAME }} --username ${{ secrets.REGISTRY_USERNAME }} --password-stdin
 
       - name: Build and push Docker image
         run: |
-          docker build -t ${{ secrets.CONTAINER_REGISTERY_SERVER_NAME }}:${{ github.sha }} .
-          docker push ${{ secrets.CONTAINER_REGISTERY_SERVER_NAME }}:${{ github.sha }}
+          docker build -t ${{ secrets.CONTAINER_REGISTRY_SERVER_NAME }}:${{ github.sha }} .
+          docker push ${{ secrets.CONTAINER_REGISTRY_SERVER_NAME }}:${{ github.sha }}
 
       - name: "Deploy from ACR to App Service"
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ secrets.WEBAPP_NAME }}
-          images: "${{ secrets.CONTAINER_REGISTERY_SERVER_NAME }}:${{ github.sha }}"
+          images: "${{ secrets.CONTAINER_REGISTRY_SERVER_NAME }}:${{ github.sha }}"
 
       - name: Log out from Azure
         run: |
