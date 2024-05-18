@@ -17,4 +17,4 @@ RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/
 
 EXPOSE 22 3000
 
-CMD ["node", "index.js"]
+CMD service ssh start && npm start
