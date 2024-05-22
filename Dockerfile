@@ -13,4 +13,4 @@ COPY . .
 
 EXPOSE 2222 3000
 
-CMD /usr/sbin/sshd && npm start
+CMD ["sh", "-c", "/usr/sbin/sshd && npm start"]
