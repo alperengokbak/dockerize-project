@@ -13,4 +13,4 @@ COPY . .
 
 EXPOSE 2222 3000
 
-CMD service ssh start && npm start
+CMD /usr/sbin/sshd && npm start
