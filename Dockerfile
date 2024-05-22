@@ -1,7 +1,6 @@
 FROM mcr.microsoft.com/appsvc/node:10-lts
 
 ENV HOST 0.0.0.0
-ENV PORT 8080
 
 WORKDIR /usr/src/app
 
@@ -11,6 +10,8 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 2222 8080
+EXPOSE 2222 3000
+
+#ENTRYPOINT ["pm2", "start", "--no-daemon", "/opt/startup/default-static-site.js"]
 
 CMD service ssh start && npm start
