@@ -18,6 +18,6 @@ RUN sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/ss
 
 RUN chmod 600 /etc/ssh/sshd_config
 
-EXPOSE 22 3000
+EXPOSE 2222 3000
 
 CMD service ssh start && npm start
