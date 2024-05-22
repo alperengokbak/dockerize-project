@@ -1,5 +1,8 @@
 FROM node:latest
 
+ENV HOST 0.0.0.0
+ENV PORT 8080
+
 WORKDIR /usr/src/app
 
 COPY package*.json ./
