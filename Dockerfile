@@ -22,4 +22,7 @@ RUN chmod 600 /etc/ssh/sshd_config
 
 EXPOSE 2222 3000
 
-CMD ["/usr/sbin/sshd", "-D", "npm", "start"]
+COPY start.sh /usr/src/app/start.sh
+RUN chmod +x /usr/src/app/start.sh
+
+CMD ["/usr/src/app/start.sh"]
