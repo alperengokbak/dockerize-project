@@ -1,10 +1,6 @@
-FROM node:14
+FROM node:16
 
-RUN apt-get update && apt-get install -y openssh-server
-
-ENV PORT 3000
-
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY package*.json ./
 
@@ -12,13 +8,14 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 3000 2222
+RUN apt-get update && \
+    apt-get install -y openssh-server && \
+    mkdir /var/run/sshd
 
-RUN mkdir /var/run/sshd && \
-    echo 'root:Docker!' | chpasswd && \
-    sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
-    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
-    sed -i 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' /etc/pam.d/sshd && \
-    echo "export VISIBLE=now" >> /etc/profile
+RUN echo 'root:Docker!' | chpasswd
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed -i 's/Port 22/Port 2222/' /etc/ssh/sshd_config
 
-CMD ["/usr/sbin/sshd", "-D"] && ["node", "index.js"]
+EXPOSE 2222 3000
+
+CMD service ssh start && node index.js
