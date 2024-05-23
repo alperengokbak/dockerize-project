@@ -1,6 +1,6 @@
-FROM node:latest
+FROM node:14
 
-ENV PORT 3000
+RUN apt-get update && apt-get install -y openssh-server
 
 WORKDIR /usr/src/app
 
@@ -10,19 +10,13 @@ RUN npm install
 
 COPY . .
 
-RUN apt-get update && apt-get install -y openssh-server
+EXPOSE 3000 2222
 
-RUN mkdir /var/run/sshd
-RUN echo "root:Docker!" | chpasswd
-RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
-RUN sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+RUN mkdir /var/run/sshd && \
+    echo 'root:Docker!' | chpasswd && \
+    sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -i 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' /etc/pam.d/sshd && \
+    echo "export VISIBLE=now" >> /etc/profile
 
-RUN chmod 600 /etc/ssh/sshd_config
-
-EXPOSE 2222 3000
-
-COPY start.sh /usr/src/app/start.sh
-RUN chmod +x /usr/src/app/start.sh
-
-CMD ["/usr/src/app/start.sh"]
+CMD ["/usr/sbin/sshd", "-D"] && ["node", "index.js"]
