@@ -1,3 +1,5 @@
 node_modules
 npm-debug.log
 Dockerfile2.txt
+Dockerfile2
+.dockerignore

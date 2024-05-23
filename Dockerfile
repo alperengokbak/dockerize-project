@@ -22,4 +22,4 @@ RUN chmod 600 /etc/ssh/sshd_config
 
 EXPOSE 2222 3000
 
-CMD service ssh start && npm start
+CMD ["/usr/sbin/sshd", "-D", "npm", "start"]
