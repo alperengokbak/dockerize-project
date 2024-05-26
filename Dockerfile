@@ -12,7 +12,7 @@ COPY sshd_config /etc/ssh/
 
 COPY entrypoint.sh ./
 
-RUN apk add openssh \
+RUN apk add --no-cache openssh \
     && echo "root:Docker!" | chpasswd \
     && chmod +x ./entrypoint.sh \
     && cd /etc/ssh/ \
