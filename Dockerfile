@@ -1,4 +1,4 @@
-FROM node:16
+FROM node:lts-alpine3.20
 
 WORKDIR /app
 
@@ -8,14 +8,16 @@ RUN npm install
 
 COPY . .
 
-RUN apt-get update && \
-    apt-get install -y openssh-server && \
-    mkdir /var/run/sshd
+COPY sshd_config /etc/ssh/
 
-RUN echo 'root:Docker!' | chpasswd
-RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-RUN sed -i 's/Port 22/Port 2222/' /etc/ssh/sshd_config
+COPY entrypoint.sh ./
 
-EXPOSE 2222 3000
+RUN apk add openssh \
+    && echo "root:Docker!" | chpasswd \
+    && chmod +x ./entrypoint.sh \
+    && cd /etc/ssh/ \
+    && ssh-keygen -A
 
-CMD service ssh start && node index.js
+EXPOSE 3000 2222
+
+ENTRYPOINT [ "./entrypoint.sh" ]
